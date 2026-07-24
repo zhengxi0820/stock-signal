@@ -74,4 +74,9 @@
 ## 安全边界
 
 - 认证已实现（单账号口令，`AUTH_TOKEN` 环境变量启用，登录换 HttpOnly 派生 Cookie）：本机开发默认关闭，**公网部署必须启用**并配 HTTPS（Caddy 自动证书，见 deploy/README.md 安全检查单）。
+- 防爆破：登录同一 IP 连续失败 5 次锁定 15 分钟（429），成功/失败写审计日志（`AUTH login success/fail ip=...`，可对接 fail2ban）。
+- Cookie 加固：HttpOnly + SameSite=Strict + Secure（本地 HTTP 开发可用 `SECURE_COOKIE=false` 关闭 Secure）。
+- 信息收口：认证启用后 Swagger/api-docs 也需登录，生产可用 `SWAGGER_ENABLED=false` 整体关闭。
+- 安全响应头在 Caddy 层下发（X-Frame-Options/nosniff/Referrer-Policy/CSP，见 deploy/Caddyfile）。
+- 批处理防滥用：同一市场已有运行进行中（2 小时内 RUNNING 阶段）或距上次开始不足 10 分钟冷却期时，拒绝重复触发 DailyRun（409）。
 - MySQL 不对公网开放，仅本机访问。

@@ -42,6 +42,8 @@ public class DailyRunService {
 
     private static final Logger log = LoggerFactory.getLogger(DailyRunService.class);
     private static final int LOOKBACK_YEARS = 3;
+    /** 触发冷却：同一市场距上次运行开始不足该分钟数则拒绝（防批处理被反复触发）。 */
+    private static final int COOLDOWN_MINUTES = 10;
 
     private final MarketDataProvider marketDataProvider;
     private final DailyQuoteMapper dailyQuoteMapper;
@@ -74,9 +76,18 @@ public class DailyRunService {
     }
 
     /**
-     * 对指定市场执行一次 DailyRun，返回 runId。
+     * 对指定市场执行一次 DailyRun，返回 runId；冷却期内（距上次开始 < 10 分钟）返回 null。
      */
     public String run(String market) {
+        if (jobRunMapper.countRunningByMarket(market) > 0) {
+            log.info("DailyRun 已有进行中的运行，跳过 market={}", market);
+            return null;
+        }
+        java.time.LocalDateTime lastStart = jobRunMapper.findLatestStartByMarket(market);
+        if (lastStart != null && lastStart.isAfter(java.time.LocalDateTime.now().minusMinutes(COOLDOWN_MINUTES))) {
+            log.info("DailyRun 冷却期内跳过 market={} lastStart={}", market, lastStart);
+            return null;
+        }
         String runId = UUID.randomUUID().toString();
         log.info("DailyRun 开始 runId={} market={}", runId, market);
 

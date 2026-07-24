@@ -24,6 +24,7 @@
 3. 指标值不落库，落库的只有信号；`signals` 表重跑幂等（唯一约束）。注意表名是 `signals`（`signal` 是 MySQL 保留字）。
 4. 数据获取隔离在 `MarketDataProvider` 接口 + fetch/ Python 薄脚本之后。
 5. 密钥（webhook token、DB 密码）一律走环境变量/本地配置，严禁入仓。
+6. 安全机制不可削弱：公网部署必须启用 `AUTH_TOKEN`；登录限流（5 次失败锁 15 分钟）、Swagger 认证收口、Cookie 的 Secure/SameSite 不得因"本地调试方便"而在代码中默认关闭。
 
 ## 技术栈
 

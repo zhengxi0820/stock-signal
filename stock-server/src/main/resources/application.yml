@@ -23,8 +23,10 @@ stock:
     script-dir: ${FETCH_DIR:fetch}
 
 # API 文档（springdoc）：文档从代码注解生成，接口改动必须同步维护注解
+# 认证启用后 swagger 也需登录；生产可用 SWAGGER_ENABLED=false 整体关闭
 springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+    enabled: ${SWAGGER_ENABLED:true}

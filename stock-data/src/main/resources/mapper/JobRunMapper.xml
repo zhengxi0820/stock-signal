@@ -43,4 +43,20 @@
         SELECT * FROM job_run WHERE run_id = #{runId} ORDER BY started_at
     </select>
 
+    <select id="findLatestStartByMarket" resultType="java.time.LocalDateTime">
+        SELECT MAX(started_at) FROM job_run WHERE market = #{market}
+    </select>
+
+    <select id="countRunningByMarket" resultType="int">
+        SELECT COUNT(*) FROM job_run
+        WHERE market = #{market} AND status = 'RUNNING'
+          AND started_at > NOW() - INTERVAL 2 HOUR
+    </select>
+
+    <update id="failStaleRunning">
+        UPDATE job_run
+        SET status = 'FAILED', finished_at = NOW(), error = #{error}
+        WHERE status = 'RUNNING'
+    </update>
+
 </mapper>

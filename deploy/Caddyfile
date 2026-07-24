@@ -2,4 +2,12 @@
 stock.example.com {
     reverse_proxy 127.0.0.1:8080
     encode gzip
+
+    # 安全响应头（防点击劫持/MIME嗅探，限制外部资源源）
+    header {
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdn.staticfile.org https://lib.baomitu.com; style-src 'self' 'unsafe-inline'"
+    }
 }

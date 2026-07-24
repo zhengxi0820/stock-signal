@@ -26,12 +26,16 @@ public class DailyRunController {
     }
 
     @Operation(summary = "手动触发一次 DailyRun",
-            description = "对指定市场执行 校验→评估→通知 全流程。幂等：重跑不产生重复信号、无新信号不重复推送。")
+            description = "对指定市场执行 抓取→校验→评估→通知 全流程。幂等：重跑不产生重复信号、无新信号不重复推送。已有运行进行中或 10 分钟冷却期内拒绝（409）。")
     @PostMapping
     public Map<String, String> trigger(
             @Parameter(description = "市场代码", example = "SH")
             @RequestParam String market) {
         String runId = dailyRunService.run(market);
+        if (runId == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.CONFLICT, "该市场已有运行进行中或处于 10 分钟冷却期");
+        }
         return Map.of("runId", runId, "market", market);
     }
 }

@@ -65,9 +65,32 @@ sudo systemctl reload caddy   # 自动签发证书
 ## 5. 安全与运维检查单（上线前逐项打勾）
 
 - [ ] AUTH_TOKEN 已配置（页面登录生效，股票池 CRUD 需登录）
-- [ ] HTTPS 可访问（https://域名），HTTP 自动跳转
+- [ ] 登录防爆破已验证：连续 5 次错误口令 → 429 锁定 15 分钟（应用内置，无需额外组件）
+- [ ] HTTPS 可访问（https://域名），HTTP 自动跳转；Cookie 带 Secure + SameSite=Strict
+- [ ] 安全响应头已生效（deploy/Caddyfile 的 header 块）：`curl -sI https://域名 | grep -i x-frame`
+- [ ] Swagger 已收口：`curl https://域名/api-docs` 未登录返回 401（或 SWAGGER_ENABLED=false 整体关闭）
 - [ ] MySQL 仅 127.0.0.1（`ss -tlnp | grep 3306` 确认不公网）
 - [ ] env.sh 权限 600，不含在 git 中
 - [ ] backup.sh 每日执行且恢复演练过一次（`mysql stock_signal < 备份文件` 到临时库验证）
 - [ ] 连续 3 个交易日：job_run 四阶段 SUCCESS、微信推送到达
 - [ ] 父亲手机实测：打开网址 → 登录 → 看金叉大屏 → 管理自选
+
+## 6. fail2ban（可选增强，封禁爆破 IP）
+
+应用审计日志格式为 `AUTH login fail ip=...`（在 stock-signal 日志中），fail2ban 规则示例：
+
+```ini
+# /etc/fail2ban/filter.d/stock-signal.conf
+[Definition]
+failregex = AUTH login fail ip=<HOST>
+ignoreregex =
+
+# /etc/fail2ban/jail.d/stock-signal.conf
+[stock-signal]
+enabled = true
+filter = stock-signal
+logpath = /var/log/stock-signal.log
+maxretry = 10
+bantime = 1h
+```
+

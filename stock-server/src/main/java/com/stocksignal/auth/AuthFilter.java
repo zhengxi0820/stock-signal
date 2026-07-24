@@ -29,11 +29,12 @@ public class AuthFilter extends OncePerRequestFilter {
             return true;
         }
         String path = request.getRequestURI();
-        return !path.startsWith("/api/")
-                || path.equals("/api/health")
-                || path.startsWith("/api/auth/")
+        boolean protectedPath = path.startsWith("/api/")
                 || path.startsWith("/api-docs")
                 || path.startsWith("/swagger-ui");
+        return !protectedPath
+                || path.equals("/api/health")
+                || path.startsWith("/api/auth/");
     }
 
     @Override

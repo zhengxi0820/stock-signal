@@ -289,6 +289,8 @@ createApp({
                 this.loginError = '';
                 this.password = '';
                 this.loadAll();
+            } else if (r.status === 429) {
+                this.loginError = '失败次数过多，已锁定 15 分钟';
             } else {
                 this.loginError = '口令错误，请重试';
             }
