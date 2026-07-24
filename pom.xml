@@ -26,7 +26,7 @@
         <java.version>17</java.version>
         <ta4j.version>0.16</ta4j.version>
         <mybatis.version>3.5.16</mybatis.version>
-        <mybatis-spring-boot.version>3.0.3</mybatis-spring-boot.version>
+        <mybatis-spring-boot.version>4.1.0</mybatis-spring-boot.version>
         <springdoc.version>2.5.0</springdoc.version>
     </properties>
 
