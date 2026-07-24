@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stocksignal.data.mapper.DailyQuoteMapper">
+
+    <resultMap id="dailyQuoteMap" type="com.stocksignal.data.entity.DailyQuote">
+        <result property="market" column="market"/>
+        <result property="code" column="code"/>
+        <result property="tradeDate" column="trade_date"/>
+        <result property="open" column="open"/>
+        <result property="high" column="high"/>
+        <result property="low" column="low"/>
+        <result property="close" column="close"/>
+        <result property="volume" column="volume"/>
+        <result property="adjust" column="adjust"/>
+        <result property="source" column="source"/>
+        <result property="fetchedAt" column="fetched_at"/>
+    </resultMap>
+
+    <select id="findRange" resultMap="dailyQuoteMap">
+        SELECT market, code, trade_date, open, high, low, close, volume, adjust, source, fetched_at
+        FROM daily_quote
+        WHERE market = #{market}
+          AND code = #{code}
+          AND trade_date BETWEEN #{start} AND #{end}
+        ORDER BY trade_date ASC
+    </select>
+
+    <select id="findLatestTradeDate" resultType="java.time.LocalDate">
+        SELECT MAX(trade_date)
+        FROM daily_quote
+        WHERE market = #{market}
+          AND code = #{code}
+    </select>
+
+</mapper>

@@ -1,0 +1,27 @@
+# AGENTS.md — 本仓库的硬性约定
+
+## 文档即契约（最高优先级规则）
+
+**任何接口或行为变更，必须在同一次改动中同步维护文档，否则视为改动未完成。**
+
+- REST API：文档由 springdoc-openapi 从代码注解生成（`/swagger-ui.html`）。新增/修改接口必须维护 `@Operation`/`@Tag` 等注解，禁止"先改代码后补文档"。
+- 架构与已冻结决策：维护在 `docs/architecture.md`。凡是改动了其中记录的决策（KDJ 语义、幂等规则、DailyRun 编排、表结构等），必须同步更新该文件。
+- 本文件（AGENTS.md）描述的约定若被改动，同步更新本文件。
+
+## 构建与验证
+
+- 构建/安装：`mvn install`（多模块项目，运行 stock-server 前必须先 install 兄弟模块）
+- 启动：`mvn -pl stock-server spring-boot:run`，健康检查 `GET /api/health` 返回 `{"status":"UP"}`
+- stock-engine 是纯库：不依赖 Spring、不依赖数据库，改动后必须保证其单测可独立通过
+
+## 架构红线（不可违反，除非先改 docs/architecture.md 并说明理由）
+
+1. 信号引擎无状态、与调度解耦：引擎代码中不出现"每天/定时/batch"概念，契约是"给定 K 线序列 + 策略配置 → 信号"。
+2. 业务代码只依赖 Mapper 接口，SQL 不渗入业务层。
+3. 指标值不落库，落库的只有信号；signal 表重跑幂等（唯一约束）。
+4. 数据获取隔离在 `MarketDataProvider` 接口 + fetch/ Python 薄脚本之后。
+5. 密钥（webhook token、DB 密码）一律走环境变量/本地配置，严禁入仓。
+
+## 技术栈
+
+Java 17 + Spring Boot 3 + MyBatis + MySQL 8 + TA4J；前端为静态薄页面（CDN Vue/ECharts，无 npm 工程）；取数为 Python + akshare（fetch/ 目录）。
