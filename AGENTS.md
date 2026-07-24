@@ -11,14 +11,17 @@
 ## 构建与验证
 
 - 构建/安装：`mvn install`（多模块项目，运行 stock-server 前必须先 install 兄弟模块）
-- 启动：`mvn -pl stock-server spring-boot:run`，健康检查 `GET /api/health` 返回 `{"status":"UP"}`
-- stock-engine 是纯库：不依赖 Spring、不依赖数据库，改动后必须保证其单测可独立通过
+- 启动：`mvn -pl stock-server spring-boot:run`，健康检查 `GET /api/health` 返回 `{"status":"UP"}`；页面 `http://localhost:8080`
+- 触发一次扫描：`curl -X POST "http://localhost:8080/api/daily-runs?market=SH"`
+- 测试：`mvn test`（stock-engine 是纯库：不依赖 Spring/DB，其单测必须可独立通过；stock-server 的集成测试在本机无 MySQL 时自动跳过）
+- 环境变量（本地运行 jar 时需设置）：`FETCH_PYTHON` / `FETCH_DIR`（fetch 脚本路径）；`AUTH_TOKEN`（页面口令，本机可空）；`PUSHPLUS_TOKEN`（微信推送，`NOTIFIER=wechat` 时需要）
+- 注意：重新 `mvn package` 前须先停掉正在运行的 jar（Windows 文件锁会导致 repackage 失败）
 
 ## 架构红线（不可违反，除非先改 docs/architecture.md 并说明理由）
 
 1. 信号引擎无状态、与调度解耦：引擎代码中不出现"每天/定时/batch"概念，契约是"给定 K 线序列 + 策略配置 → 信号"。
 2. 业务代码只依赖 Mapper 接口，SQL 不渗入业务层。
-3. 指标值不落库，落库的只有信号；signal 表重跑幂等（唯一约束）。
+3. 指标值不落库，落库的只有信号；`signals` 表重跑幂等（唯一约束）。注意表名是 `signals`（`signal` 是 MySQL 保留字）。
 4. 数据获取隔离在 `MarketDataProvider` 接口 + fetch/ Python 薄脚本之后。
 5. 密钥（webhook token、DB 密码）一律走环境变量/本地配置，严禁入仓。
 

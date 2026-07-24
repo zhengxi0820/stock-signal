@@ -38,8 +38,11 @@ pip install -r requirements.txt
 python fetch_index.py --index CSI300
 python fetch_batch.py --index CSI300
 
-# 3. 构建并启动
+# 3. 构建并启动（回到仓库根；FETCH_* 指向 fetch 脚本，Windows 路径示例如下）
+cd ..
 mvn install
+export FETCH_PYTHON="$PWD/fetch/.venv/Scripts/python.exe"  # Linux 为 fetch/.venv/bin/python
+export FETCH_DIR="$PWD/fetch"
 mvn -pl stock-server spring-boot:run
 
 # 4. 触发一次全市场扫描（或等部署后 cron 定时触发）
