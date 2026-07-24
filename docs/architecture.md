@@ -19,8 +19,8 @@
 
 - `daily_quote(market, code, trade_date, open, high, low, close, volume, adjust, source, fetched_at)`，主键 `(market, code, trade_date)`。复权口径统一**前复权**。成交量单位：A股/港股为股，美股为股；价格精度按市场decimal存储。
 - `index_constituents(index_code, market, code, snapshot_date)` — 必须带快照日期。
-- `stock_pool(pool_name, market, code)`，唯一约束；支持 `"index:CSI300"` 引用，展开后按 `(market, code)` 去重。
-- `signal(market, code, trade_date, strategy, strategy_version, signal_type, indicator_snapshot JSON, run_id, generated_at)`，唯一约束 `(market, code, trade_date, strategy, strategy_version, signal_type)` — 重跑幂等。
+- `stock_pool(pool_name, market, code)`，唯一约束；支持 `"index:CSI300"` 引用，展开后按 `(market, code)` 去重。**池成员 = YAML `pools` 条目 ∪ `stock_pool` 表条目**（YAML 归运营者，表由页面管理）。
+- `signals(market, code, trade_date, strategy, strategy_version, signal_type, indicator_snapshot JSON, run_id, generated_at)`，唯一约束 `(market, code, trade_date, strategy, strategy_version, signal_type)` — 重跑幂等。（表名为 `signals`：`signal` 是 MySQL 保留字。）
 - `job_run(run_id, market, phase, status, started_at, finished_at, stats JSON, error)` — 运维表，记录每次运行各阶段成败与数据新鲜度。
 
 指标值不落库，查询/画图时现算；落库的只有信号。
@@ -46,6 +46,21 @@
 
 - 每阶段写 `job_run`；抓取/校验失败 → 不计算、不推正常信号，改推失败告警（按 job_run 去重）。
 - 任一阶段可独立重跑，全链路幂等。
+- EVALUATE 对整段历史序列评估，`signals` 表保存**全部历史信号**（INSERT IGNORE 幂等）；首次运行回填历史，之后每次只新增。
+- NOTIFY 仅在本次有**新增**信号时推送，重跑无新信号 → 不重复打扰。
+- 通知实现按配置选择：`stock.notifier=console`（默认，开发期）/ `wechat`（PushPlus，token 走环境变量 `PUSHPLUS_TOKEN`）。
+
+## 前端大屏口径（冻结）
+
+- "当前金叉/死叉状态"：每只股票每个策略取 `signals` 中**最近一次**信号，最近信号为金叉 → 当前金叉状态，反之死叉。
+- 大屏按股票聚合，多策略以标记（badge）叠加展示；新增策略后自动并入，无需改口径。
+
+## 数据源（冻结）
+
+- A 股：东财（主）/ 新浪 / 腾讯三源切换（`fetch_batch.py` 带健康记忆：东财连续失败 2 次后备用源优先）。东财/腾讯成交量单位为手需换算、新浪为股；腾讯接口实测单位为股。
+- 港股/美股：仅东财接口（`stock_hk_hist` / `stock_us_hist`），无备用源；东财对 IP 限流时表现为连接重置，待解封或在服务器执行。美股代码通过东财现货列表映射 secid（AAPL → 105.AAPL，进程内缓存）。
+- 已知待校验项：港股成交量单位（股/手）待东财可访问时验证（代码中有 TODO 标记）。
+- 所有脚本强制直连（`NO_PROXY=*`）：requests 会读取系统代理，代理开启时抓取会失败。
 - 调度按"市场 + 交易日"独立 cron 窗口（A股 17:30、港股 17:45、美股次日 08:00），引擎不含调度概念。
 
 ## 扩展点（接口即预留，不写未来实现）

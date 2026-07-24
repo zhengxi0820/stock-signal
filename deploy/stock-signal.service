@@ -1,0 +1,14 @@
+[Unit]
+Description=stock-signal server
+After=network.target mysql.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/stock-signal
+EnvironmentFile=/opt/stock-signal/env.sh
+ExecStart=/usr/bin/java -jar /opt/stock-signal/stock-server.jar
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

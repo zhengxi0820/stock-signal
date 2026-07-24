@@ -1,0 +1,5 @@
+# Caddy 反向代理示例（自动 HTTPS）。替换为你的域名。
+stock.example.com {
+    reverse_proxy 127.0.0.1:8080
+    encode gzip
+}

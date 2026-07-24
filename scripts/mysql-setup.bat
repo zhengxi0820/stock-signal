@@ -1,6 +1,6 @@
 @echo off
-REM stock-signal æœ¬åœ° MySQL åˆå§‹åŒ–è„šæœ¬ â€”â€” éœ€è¦ã€ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œã€‘ä¸€æ¬¡
-REM ä½œç”¨ï¼šåˆå§‹åŒ–æ•°æ®ç›®å½•ã€æ³¨å†Œå¹¶å¯åŠ¨ MySQL84 æœåŠ¡ã€å»ºåº“å»ºè¡¨ï¼ˆdocs/db/schema.sqlï¼‰ã€åˆ›å»ºåº”ç”¨è´¦å· stock
+REM stock-signal ±¾µØ MySQL ³õÊ¼»¯½Å±¾ ¡ª¡ª ĞèÒª¡¾ÒÔ¹ÜÀíÔ±Éí·İÔËĞĞ¡¿Ò»´Î
+REM ×÷ÓÃ£º³õÊ¼»¯Êı¾İÄ¿Â¼¡¢×¢²á²¢Æô¶¯ MySQL84 ·şÎñ¡¢½¨¿â½¨±í£¨docs/db/schema.sql£©¡¢´´½¨Ó¦ÓÃÕËºÅ stock
 setlocal
 
 set "MYSQL_HOME=C:\Program Files\MySQL\MySQL Server 8.4"
@@ -8,35 +8,35 @@ set "MYSQL_DATA=C:\ProgramData\MySQL\MySQL Server 8.4"
 set "SCHEMA=%~dp0..\docs\db\schema.sql"
 
 if not exist "%MYSQL_HOME%\bin\mysqld.exe" (
-    echo [ERROR] æœªæ‰¾åˆ° %MYSQL_HOME%\bin\mysqld.exeï¼Œè¯·ç¡®è®¤ MySQL å®‰è£…è·¯å¾„
+    echo [ERROR] Î´ÕÒµ½ %MYSQL_HOME%\bin\mysqld.exe£¬ÇëÈ·ÈÏ MySQL °²×°Â·¾¶
     pause & exit /b 1
 )
 
-echo [1/5] åˆå§‹åŒ–æ•°æ®ç›®å½•ï¼ˆroot ç©ºå¯†ç ï¼Œä»…æœ¬æœºå¼€å‘ç”¨ï¼‰...
+echo [1/5] ³õÊ¼»¯Êı¾İÄ¿Â¼£¨root ¿ÕÃÜÂë£¬½ö±¾»ú¿ª·¢ÓÃ£©...
 mkdir "%MYSQL_DATA%" 2>nul
 "%MYSQL_HOME%\bin\mysqld.exe" --initialize-insecure --datadir="%MYSQL_DATA%\Data"
-if errorlevel 1 ( echo [ERROR] åˆå§‹åŒ–å¤±è´¥ & pause & exit /b 1 )
+if errorlevel 1 ( echo [ERROR] ³õÊ¼»¯Ê§°Ü & pause & exit /b 1 )
 
-echo [2/5] å†™å…¥ my.ini ...
+echo [2/5] Ğ´Èë my.ini ...
 > "%MYSQL_DATA%\my.ini" echo [mysqld]
 >> "%MYSQL_DATA%\my.ini" echo datadir=%MYSQL_DATA:\=\\%\\Data
 >> "%MYSQL_DATA%\my.ini" echo port=3306
 >> "%MYSQL_DATA%\my.ini" echo character-set-server=utf8mb4
 >> "%MYSQL_DATA%\my.ini" echo bind-address=127.0.0.1
 
-echo [3/5] æ³¨å†Œå¹¶å¯åŠ¨ MySQL84 æœåŠ¡...
+echo [3/5] ×¢²á²¢Æô¶¯ MySQL84 ·şÎñ...
 "%MYSQL_HOME%\bin\mysqld.exe" --install MySQL84 --defaults-file="%MYSQL_DATA%\my.ini"
 net start MySQL84
-if errorlevel 1 ( echo [ERROR] æœåŠ¡å¯åŠ¨å¤±è´¥ & pause & exit /b 1 )
+if errorlevel 1 ( echo [ERROR] ·şÎñÆô¶¯Ê§°Ü & pause & exit /b 1 )
 
-echo [4/5] å»ºåº“å»ºè¡¨...
+echo [4/5] ½¨¿â½¨±í...
 "%MYSQL_HOME%\bin\mysql.exe" -u root --skip-password < "%SCHEMA%"
-if errorlevel 1 ( echo [ERROR] schema å¯¼å…¥å¤±è´¥ & pause & exit /b 1 )
+if errorlevel 1 ( echo [ERROR] schema µ¼ÈëÊ§°Ü & pause & exit /b 1 )
 
-echo [5/5] åˆ›å»ºåº”ç”¨è´¦å· stock / stockï¼ˆä»… localhostï¼Œä¸ application.yml é»˜è®¤å€¼ä¸€è‡´ï¼‰...
+echo [5/5] ´´½¨Ó¦ÓÃÕËºÅ stock / stock£¨½ö localhost£¬Óë application.yml Ä¬ÈÏÖµÒ»ÖÂ£©...
 "%MYSQL_HOME%\bin\mysql.exe" -u root --skip-password -e "CREATE USER IF NOT EXISTS 'stock'@'localhost' IDENTIFIED BY 'stock'; GRANT ALL PRIVILEGES ON stock_signal.* TO 'stock'@'localhost'; FLUSH PRIVILEGES;"
 
 echo.
-echo å®Œæˆã€‚root å½“å‰ä¸ºç©ºå¯†ç ä¸”ä»…ç›‘å¬ 127.0.0.1ï¼Œæœ¬æœºå¼€å‘å¤Ÿç”¨ï¼›å¦‚éœ€è®¾ root å¯†ç ï¼š
-echo   mysql -u root --skip-password -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'ä½ çš„å¯†ç ';"
+echo Íê³É¡£root µ±Ç°Îª¿ÕÃÜÂëÇÒ½ö¼àÌı 127.0.0.1£¬±¾»ú¿ª·¢¹»ÓÃ£»ÈçĞèÉè root ÃÜÂë£º
+echo   mysql -u root --skip-password -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'ÄãµÄÃÜÂë';"
 pause
