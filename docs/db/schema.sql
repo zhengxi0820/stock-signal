@@ -40,7 +40,8 @@ CREATE TABLE IF NOT EXISTS stock_pool (
 ) ENGINE=InnoDB COMMENT='股票池';
 
 -- 信号。重跑幂等：唯一约束覆盖策略版本
-CREATE TABLE IF NOT EXISTS signal (
+-- 表名为 signals（signal 是 MySQL 保留字）
+CREATE TABLE IF NOT EXISTS signals (
     id                 BIGINT       NOT NULL AUTO_INCREMENT,
     market             VARCHAR(8)   NOT NULL,
     code               VARCHAR(16)  NOT NULL,

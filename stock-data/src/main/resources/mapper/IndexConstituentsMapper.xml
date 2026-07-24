@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stocksignal.data.mapper.IndexConstituentsMapper">
+
+    <resultMap id="indexConstituentMap" type="com.stocksignal.data.entity.IndexConstituent">
+        <result property="indexCode" column="index_code"/>
+        <result property="market" column="market"/>
+        <result property="code" column="code"/>
+        <result property="snapshotDate" column="snapshot_date"/>
+    </resultMap>
+
+    <select id="findLatestSnapshot" resultMap="indexConstituentMap">
+        SELECT * FROM index_constituents
+        WHERE index_code = #{indexCode}
+          AND snapshot_date = (SELECT MAX(snapshot_date) FROM index_constituents WHERE index_code = #{indexCode})
+    </select>
+
+</mapper>

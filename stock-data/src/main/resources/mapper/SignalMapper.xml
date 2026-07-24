@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stocksignal.data.mapper.SignalMapper">
+
+    <resultMap id="signalMap" type="com.stocksignal.data.entity.Signal">
+        <id property="id" column="id"/>
+        <result property="market" column="market"/>
+        <result property="code" column="code"/>
+        <result property="tradeDate" column="trade_date"/>
+        <result property="strategy" column="strategy"/>
+        <result property="strategyVersion" column="strategy_version"/>
+        <result property="signalType" column="signal_type"/>
+        <result property="indicatorSnapshot" column="indicator_snapshot"/>
+        <result property="runId" column="run_id"/>
+        <result property="generatedAt" column="generated_at"/>
+    </resultMap>
+
+    <insert id="insertIgnore" parameterType="com.stocksignal.data.entity.Signal">
+        INSERT IGNORE INTO signals
+            (market, code, trade_date, strategy, strategy_version, signal_type,
+             indicator_snapshot, run_id, generated_at)
+        VALUES
+            (#{market}, #{code}, #{tradeDate}, #{strategy}, #{strategyVersion}, #{signalType},
+             #{indicatorSnapshot}, #{runId}, NOW())
+    </insert>
+
+    <select id="findByTradeDate" resultMap="signalMap">
+        SELECT * FROM signals WHERE trade_date = #{tradeDate} ORDER BY market, code
+    </select>
+
+    <select id="findByStock" resultMap="signalMap">
+        SELECT * FROM signals
+        WHERE market = #{market} AND code = #{code}
+          AND trade_date BETWEEN #{start} AND #{end}
+        ORDER BY trade_date ASC
+    </select>
+
+    <select id="findLatestPerStock" resultMap="signalMap">
+        SELECT s.* FROM signals s
+        JOIN (
+            SELECT market, code, strategy, MAX(trade_date) AS md
+            FROM signals
+            GROUP BY market, code, strategy
+        ) t ON s.market = t.market AND s.code = t.code
+           AND s.strategy = t.strategy AND s.trade_date = t.md
+        ORDER BY s.trade_date DESC, s.market, s.code
+    </select>
+
+</mapper>

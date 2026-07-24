@@ -1,0 +1,22 @@
+# 策略与股票池配置（归运营者管理，页面不做策略编辑）
+# 结构约定见 docs/architecture.md「策略配置模型」，改动需同步更新该文档。
+# 加载路径可用启动参数覆盖：--stock.strategies-config=file:/path/to/strategies.yaml
+
+# 股票池：池名 → 股票列表（"市场:代码"）。"index:CSI300" 引用指数最新快照成分（fetch/fetch_index.py 同步）
+pools:
+  default:
+    - index:CSI300
+    - SH:600519
+
+# 策略列表：type + 参数 + 命名过滤器
+strategies:
+  - name: kdj-cross
+    type: kdj_cross
+    pool: default
+    params:
+      period: 9          # KDJ 窗口
+      kSmooth: 3         # K 平滑参数
+      dSmooth: 3         # D 平滑参数
+      lowThreshold: 20   # 低位阈值：金叉要求交叉日 K ≤ 该值
+      highThreshold: 80  # 高位阈值：死叉要求交叉日 K ≥ 该值
+    filters: []          # 可选: volume_surge / above_ma20

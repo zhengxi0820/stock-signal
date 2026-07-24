@@ -33,4 +33,10 @@
           AND code = #{code}
     </select>
 
+    <select id="findLatestTradeDatePerMarket" resultType="map">
+        SELECT market, MAX(trade_date) AS latest_trade_date
+        FROM daily_quote
+        GROUP BY market
+    </select>
+
 </mapper>

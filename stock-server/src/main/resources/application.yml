@@ -4,17 +4,23 @@ server:
 spring:
   application:
     name: stock-signal
-  # M1a 接入真实 MySQL 后移除下面这行排除（届时需要可用的数据源才能启动）
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   datasource:
     url: ${DB_URL:jdbc:mysql://localhost:3306/stock_signal?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai}
     username: ${DB_USER:stock}
     password: ${DB_PASSWORD:stock}
 
 mybatis:
+  mapper-locations: classpath*:mapper/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+# 通知实现：console（默认）/ wechat（需环境变量 PUSHPLUS_TOKEN）
+stock:
+  notifier: ${NOTIFIER:console}
+  fetch:
+    # fetch 脚本路径：Windows 用 .venv/Scripts/python.exe，Linux 服务器用 .venv/bin/python
+    python-path: ${FETCH_PYTHON:fetch/.venv/Scripts/python.exe}
+    script-dir: ${FETCH_DIR:fetch}
 
 # API 文档（springdoc）：文档从代码注解生成，接口改动必须同步维护注解
 springdoc:

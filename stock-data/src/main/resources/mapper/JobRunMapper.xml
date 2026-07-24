@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stocksignal.data.mapper.JobRunMapper">
+
+    <resultMap id="jobRunMap" type="com.stocksignal.data.entity.JobRun">
+        <result property="runId" column="run_id"/>
+        <result property="market" column="market"/>
+        <result property="phase" column="phase"/>
+        <result property="status" column="status"/>
+        <result property="startedAt" column="started_at"/>
+        <result property="finishedAt" column="finished_at"/>
+        <result property="stats" column="stats"/>
+        <result property="error" column="error"/>
+    </resultMap>
+
+    <insert id="upsertRunning" parameterType="com.stocksignal.data.entity.JobRun">
+        INSERT INTO job_run (run_id, market, phase, status, started_at)
+        VALUES (#{runId}, #{market}, #{phase}, 'RUNNING', NOW())
+        ON DUPLICATE KEY UPDATE status = 'RUNNING', started_at = NOW(),
+                                finished_at = NULL, stats = NULL, error = NULL
+    </insert>
+
+    <update id="finish" parameterType="com.stocksignal.data.entity.JobRun">
+        UPDATE job_run
+        SET status = #{status}, finished_at = NOW(), stats = #{stats}, error = #{error}
+        WHERE run_id = #{runId} AND market = #{market} AND phase = #{phase}
+    </update>
+
+    <select id="findLatestSuccess" resultMap="jobRunMap">
+        SELECT * FROM job_run
+        WHERE market = #{market} AND phase = #{phase} AND status = 'SUCCESS'
+        ORDER BY finished_at DESC LIMIT 1
+    </select>
+
+    <select id="findLatestRunPerMarket" resultMap="jobRunMap">
+        SELECT j.* FROM job_run j
+        JOIN (SELECT market, MAX(started_at) AS ms FROM job_run GROUP BY market) t
+          ON j.market = t.market AND j.started_at = t.ms
+    </select>
+
+    <select id="findByRunId" resultMap="jobRunMap">
+        SELECT * FROM job_run WHERE run_id = #{runId} ORDER BY started_at
+    </select>
+
+</mapper>
