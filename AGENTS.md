@@ -14,7 +14,7 @@
 - 启动：`mvn -pl stock-server spring-boot:run`，健康检查 `GET /api/health` 返回 `{"status":"UP"}`；页面 `http://localhost:8080`
 - 触发一次扫描：`curl -X POST "http://localhost:8080/api/daily-runs?market=SH"`
 - 测试：`mvn test`（stock-engine 是纯库：不依赖 Spring/DB，其单测必须可独立通过；stock-server 的集成测试在本机无 MySQL 时自动跳过）
-- 环境变量（本地运行 jar 时需设置）：`FETCH_PYTHON` / `FETCH_DIR`（fetch 脚本路径）；`AUTH_TOKEN`（页面口令，本机可空）；`PUSHPLUS_TOKEN`（微信推送，`NOTIFIER=wechat` 时需要）
+- 环境变量（本地运行 jar 时需设置）：`FETCH_PYTHON` / `FETCH_DIR`（fetch 脚本路径）；`AUTH_TOKEN`（页面口令，本机可空，启用后本地 HTTP 需同时设 `SECURE_COOKIE=false`）；`PUSHPLUS_TOKEN`（微信推送，`NOTIFIER=wechat` 时需要）
 - 注意：重新 `mvn package` 前须先停掉正在运行的 jar（Windows 文件锁会导致 repackage 失败）
 
 ## 架构红线（不可违反，除非先改 docs/architecture.md 并说明理由）

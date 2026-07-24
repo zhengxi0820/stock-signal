@@ -47,6 +47,7 @@
 - 每阶段写 `job_run`；任一前置阶段失败 → 不执行后续，改推失败告警。
 - 任一阶段可独立重跑，全链路幂等。
 - EVALUATE 对整段历史序列评估，`signals` 表保存**全部历史信号**（INSERT IGNORE 幂等）；首次运行回填历史，之后每次只新增。
+- 并发保护：同一市场已有进行中运行（2 小时内 RUNNING 阶段）或 10 分钟冷却期内，拒绝触发（409）。**应用启动时把全部残留 RUNNING 阶段标记 FAILED**（`StaleRunCleanup`：单实例应用启动时不存在合法进行中运行，防止进程被杀后僵死 RUNNING 阻塞该市场）。
 - NOTIFY 仅在本次有**新增**信号时推送，重跑无新信号 → 不重复打扰。
 - 通知实现按配置选择：`stock.notifier=console`（默认，开发期）/ `wechat`（PushPlus，token 走环境变量 `PUSHPLUS_TOKEN`）。
 - 运行状态对外暴露：`GET /api/runs/latest` 返回各市场最近一次运行四阶段成败与数据新鲜度（页面顶部状态条）。

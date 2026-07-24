@@ -63,6 +63,8 @@ curl -X POST "http://localhost:8080/api/daily-runs?market=SZ"
 | `FETCH_PYTHON` / `FETCH_DIR` | fetch 脚本路径 | fetch/.venv 相对路径 |
 | `NOTIFIER` / `PUSHPLUS_TOKEN` | 通知实现与微信 token | console |
 | `AUTH_TOKEN` | 页面访问口令（**公网必须配置**） | 空 = 认证关闭（仅本机） |
+| `SECURE_COOKIE` | Cookie 是否带 Secure（HTTPS 生产保持 true；本地 HTTP 调试且启用认证时设 false） | true |
+| `SWAGGER_ENABLED` | 是否启用 swagger-ui（生产可 false 整体关闭；认证启用后访问本就需登录） | true |
 
 策略与股票池：`stock-server/src/main/resources/config/strategies.yaml`（"策略类型 + 参数 + 命名过滤器"，可用 `--stock.strategies-config=file:...` 覆盖为外部文件）。
 
