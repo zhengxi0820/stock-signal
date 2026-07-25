@@ -8,6 +8,6 @@ stock.example.com {
         X-Frame-Options "DENY"
         X-Content-Type-Options "nosniff"
         Referrer-Policy "strict-origin-when-cross-origin"
-        Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdn.staticfile.org https://lib.baomitu.com; style-src 'self' 'unsafe-inline'"
+        Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
     }
 }
