@@ -49,10 +49,16 @@ public class WechatNotifier implements Notifier {
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
             HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            // PushPlus 业务错误也返回 HTTP 200，必须检查响应体 code 字段（code=200 才为成功）
             if (response.statusCode() != 200) {
                 log.error("PushPlus 推送失败 HTTP {}: {}", response.statusCode(), response.body());
-            } else {
+                return;
+            }
+            String respBody = response.body();
+            if (respBody != null && respBody.contains("\"code\":200")) {
                 log.info("微信推送成功: {}", title);
+            } else {
+                log.error("PushPlus 推送被拒: {}", respBody);
             }
         } catch (Exception e) {
             log.error("PushPlus 推送异常: {}", e.getMessage());
