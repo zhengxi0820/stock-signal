@@ -29,14 +29,8 @@ sudo mkdir -p /opt/stock-signal && sudo chown $USER /opt/stock-signal
 # 上传 jar 与 fetch/ 到 /opt/stock-signal/（scp 或 git pull + mvn package）
 
 # 环境变量（/opt/stock-signal/env.sh，chmod 600，勿入仓）
-export DB_URL='jdbc:mysql://localhost:3306/stock_signal?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai'
-export DB_USER=stock
-export DB_PASSWORD='改为强密码'
-export FETCH_PYTHON=/opt/stock-signal/fetch/.venv/bin/python
-export FETCH_DIR=/opt/stock-signal/fetch
-export NOTIFIER=wechat
-export PUSHPLUS_TOKEN='你的PushPlus token'
-export AUTH_TOKEN='页面访问口令（父亲和你共用）'
+# 直接复制 deploy/env.sh.example 修改。注意：行首禁止 export ——
+# 该文件同时被 systemd EnvironmentFile 读取（不识别 export，会整行忽略）和 shell source 使用
 
 # systemd 服务：sudo cp deploy/stock-signal.service /etc/systemd/system/ && sudo systemctl enable --now stock-signal
 ```
