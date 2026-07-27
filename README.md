@@ -20,7 +20,7 @@ stock-parent
 ├── stock-server    REST API + DailyRun 编排 + 通知 + 认证 + 静态页面
 ├── fetch/          Python + akshare 取数脚本（东财/新浪/腾讯三源切换，限流退避，断点续灌）
 ├── deploy/         部署手册、Caddy、systemd、备份、cron 示例
-└── docs/           架构决策（唯一权威来源）+ 数据库 DDL
+└── docs/           架构决策（权威来源）+ DDL + 交接进度 + 踩坑记录 + 知识手册
 ```
 
 设计原则与全部已冻结决策见 `docs/architecture.md`；贡献约定见 `AGENTS.md`（核心：**文档即契约，接口/行为变更必须同次更新文档**）。

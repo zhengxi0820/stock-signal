@@ -28,4 +28,13 @@
 
 ## 技术栈
 
-Java 17 + Spring Boot 3 + MyBatis + MySQL 8 + TA4J；前端为静态薄页面（CDN Vue/ECharts，无 npm 工程）；取数为 Python + akshare（fetch/ 目录）。
+Java 17 + Spring Boot 3 + MyBatis + MySQL 8 + TA4J；前端为静态薄页面（本地 vendor 的 Vue/ECharts，无 npm 工程）；取数为 Python + akshare（fetch/ 目录）。
+
+## 深入文档（按需阅读，改动相关领域时必读）
+
+- `docs/architecture.md` — 全部冻结决策（改行为先改它）
+- `docs/progress.md` — 交接与进度快照、待办清单（里程碑后更新）
+- `docs/pitfalls.md` — 踩坑记录（遇到报错先查）
+- `docs/db/schema.sql` — 表结构 DDL
+- `deploy/README.md` — 部署手册与安全检查单
+- `docs/股票信号系统_知识架构体系.md` — 面向 Java 工程师的全景知识手册（PDF 源稿）

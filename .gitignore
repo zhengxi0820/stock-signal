@@ -25,3 +25,9 @@ __pycache__/
 # 运行时产物
 logs/
 *.log
+
+# 生成的报告产物（源稿在 docs/，可重新生成）
+/*.pdf
+/report-preview.html
+/*.html
+!stock-server/**/*.html
