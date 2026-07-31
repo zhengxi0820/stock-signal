@@ -1,2 +1,2 @@
-akshare>=1.14
+akshare>=1.18.80
 pymysql>=1.1
